@@ -1,8 +1,7 @@
- name: Octopus AI Portrait Automated Pusher
+name: Octopus AI Portrait Automated Pusher
 
 on:
   schedule:
-    # Runs every 30 minutes (GitHub Actions schedules can sometimes delay, but fuzzy-match in runner.py handles it!)
     - cron: '*/30 * * * *'
   push:
     branches:
@@ -18,13 +17,12 @@ on:
 jobs:
   run-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
 
       - name: Set up Python
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -44,7 +42,7 @@ jobs:
             echo "Executing manual dispatch slot: ${{ github.event.inputs.slot }}"
             python runner.py ${{ github.event.inputs.slot }}
           elif [ "${{ github.event_name }}" = "push" ]; then
-            echo "Executing initial push test (triggers AI & US Market test cards)..."
+            echo "Executing initial push test..."
             python runner.py --test-us
             python runner.py --test-ai
           else
