@@ -1,4 +1,4 @@
-name: Octopus AI Portrait Automated Pusher
+ name: Octopus AI Portrait Automated Pusher
 
 on:
   schedule:
@@ -20,37 +20,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+      - name: Checkout repository
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
 
-    - name: Set up Python
-      uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
-      with:
-        python-version: '3.11'
-        cache: 'pip'
+      - name: Set up Python
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
+        with:
+          python-version: '3.11'
+          cache: 'pip'
 
-- name: Install dependencies
-  run: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-
-
-
-    - name: Run Octopus AI Portrait Automation Job
-      env:
-        PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
-      run: |
-        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          echo "Executing manual dispatch slot: ${{ github.event.inputs.slot }}"
-          python runner.py ${{ github.event.inputs.slot }}
-        elif [ "${{ github.event_name }}" = "push" ]; then
-          echo "Executing initial push test (triggers AI & US Market test cards)..."
-          python runner.py --test-us
-          python runner.py --test-ai
-        else
-          echo "Executing scheduled cron check..."
-          python runner.py --cron-check
-        fi
+      - name: Run Octopus AI Portrait Automation Job
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Executing manual dispatch slot: ${{ github.event.inputs.slot }}"
+            python runner.py ${{ github.event.inputs.slot }}
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            echo "Executing initial push test (triggers AI & US Market test cards)..."
+            python runner.py --test-us
+            python runner.py --test-ai
+          else
+            echo "Executing scheduled cron check..."
+            python runner.py --cron-check
+          fi
