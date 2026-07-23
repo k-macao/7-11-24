@@ -1,0 +1,53 @@
+name: Octopus AI Portrait Automated Pusher
+
+on:
+  schedule:
+    # Runs every 30 minutes (GitHub Actions schedules can sometimes delay, but fuzzy-match in runner.py handles it!)
+    - cron: '*/30 * * * *'
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Manual Slot trigger (e.g. --test-us, --test-ai, or direct slot like 12:00)'
+        required: true
+        default: '--test-us'
+
+jobs:
+  run-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Octopus AI Portrait Automation Job
+      env:
+        PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "Executing manual dispatch slot: ${{ github.event.inputs.slot }}"
+          python runner.py ${{ github.event.inputs.slot }}
+        elif [ "${{ github.event_name }}" = "push" ]; then
+          echo "Executing initial push test (triggers AI & US Market test cards)..."
+          python runner.py --test-us
+          python runner.py --test-ai
+        else
+          echo "Executing scheduled cron check..."
+          python runner.py --cron-check
+        fi
