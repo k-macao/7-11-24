@@ -21,10 +21,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@0f54836457f72b3a196ed11640733e465e078773
       with:
         python-version: '3.11'
         cache: 'pip'
